@@ -4,9 +4,14 @@ const chalk = require('chalk')
 const Path = require('path')
 const { isDirectory } = require('./fs')
 
-const capture = async (page, baseUrl, { path, selector, filename: _filename }, outputDir) => {
-    const url = `${baseUrl}${path}`
+/*
 
+Capture a specific URL
+
+*/
+const captureUrl = async (page, baseUrl, { path, selector, filename: _filename }, outputDir) => {
+    const url = `${baseUrl}${path}`
+    console.log(url)
     console.log(chalk`{yellow Capturing {white ${path}}} {dim (selector: ${selector})}`)
 
     await page.goto(url)
@@ -31,14 +36,49 @@ const capture = async (page, baseUrl, { path, selector, filename: _filename }, o
     console.log('')
 }
 
-const getPageConfig = ({ sectionId, pageId, chartId }) => ({
-    path: pageId ? `/${sectionId}/${pageId}/?capture` : `/${sectionId}/?capture`,
-    selector: `#${chartId}`,
-    filename: pageId ? `${sectionId}_${pageId}_${chartId}` : `${sectionId}_${chartId}`
+/*
+
+Get page config
+
+*/
+const getPageConfig = ({ pathSegments, blockId }) => ({
+    path: `/${pathSegments.join('/')}?capture`,
+    selector: `#${blockId}`,
+    filename: `${pathSegments.join('_')}_${blockId}`,
 })
 
-module.exports = async ({ baseUrl, outputDir, nav, charts }) => {
-    console.log(chalk`{yellow {white ${nav.length}} section(s) to capture}`)
+/*
+
+Capture a page sitemap (array of pages) recursively
+
+*/
+const captureSitemap = async ({ browserPage, baseUrl, outputDir, sitemap, pathSegments = [], level = 0 }) => {
+    
+    for (let page of sitemap) {
+
+        console.log(chalk`  {dim ${' '.repeat(level*2)} page: {blue ${page.id}}}`)
+
+        if (page.blocks) {
+            for (let block of page.blocks) {
+                const pageConfig = getPageConfig({ pathSegments: [...pathSegments, page.id], blockId: block.id })
+                console.log(chalk`      {dim filename: {white ${pageConfig.filename}}}`)
+                await captureUrl(browserPage, baseUrl, pageConfig, outputDir)
+            }
+        }
+
+        if (page.children) {
+           await captureSitemap({ baseUrl, outputDir, sitemap: page.children, level: level+1, pathSegments: [...pathSegments, page.id]})
+        }
+    }
+}
+
+/*
+
+Start capture process
+
+*/
+ const startCapture = async ({ baseUrl, outputDir, sitemap }) => {
+    console.log(chalk`{yellow {white ${sitemap.length}} section(s) to capture}`)
     console.log(chalk`  {dim baseUrl:   {white ${baseUrl}}}`)
     console.log(chalk`  {dim outputDir: {white ${outputDir}}}`)
     console.log('')
@@ -49,36 +89,13 @@ module.exports = async ({ baseUrl, outputDir, nav, charts }) => {
     }
 
     const browser = await puppeteer.launch({ headless: false, slowMo: 150 })
-    const page = await browser.newPage()
-    await page.setViewport({ width: 1400, height: 10000, deviceScaleFactor: 2 })
-    await page.emulateMedia('screen')
+    const browserPage = await browser.newPage()
+    await browserPage.setViewport({ width: 1400, height: 10000, deviceScaleFactor: 2 })
+    await browserPage.emulateMedia('screen')
 
-    for (let section of nav) {
-        const sectionId = section.id
-        console.log(chalk`  {dim section: {blue ${sectionId}}}`)
-        if (section.subPages) {
-            for (let pageId of section.subPages) {
-                console.log(chalk`    {dim page: {green ${pageId}}}`)
-                const pageCharts = charts[pageId] || charts.tool
-                if (pageCharts) {
-                    for (let chartId of pageCharts) {
-                        const pageConfig = getPageConfig({ sectionId, pageId, chartId })
-                        console.log(chalk`      {dim filename: {white ${pageConfig.filename}}}`)
-                        await capture(page, baseUrl, pageConfig, outputDir)
-                    }
-                }
-            }
-        } else {
-            const pageCharts = charts[section.id]
-            if (pageCharts) {
-                for (let chartId of pageCharts) {
-                    const pageConfig = getPageConfig({ sectionId, chartId })
-                    console.log(chalk`      {dim filename: {white ${pageConfig.filename}}}`)
-                    await capture(page, baseUrl, pageConfig, outputDir)
-                }
-            }
-        }
-    }
+    await captureSitemap({ browserPage, baseUrl, outputDir, sitemap})
 
     await browser.close()
 }
+
+module.exports = startCapture

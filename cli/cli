@@ -10,6 +10,6 @@ require('dotenv').load({
 
 program
     .version('0.0.1')
-    .command('capture <survey>', 'capture screenshots for a survey')
+    .command('capture <surveypath>', 'capture screenshots for a survey')
     .parse(process.argv)
 
