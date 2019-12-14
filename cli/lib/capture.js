@@ -11,14 +11,15 @@ Capture a specific URL
 */
 const captureUrl = async (page, baseUrl, { path, selector, filename: _filename }, outputDir) => {
     const url = `${baseUrl}${path}`
-    console.log(url)
     console.log(chalk`{yellow Capturing {white ${path}}} {dim (selector: ${selector})}`)
 
     await page.goto(url)
 
     const element = await page.$(selector)
     if (element === null) {
-        throw new Error(`Unable to find element matching selector: '${selector}' (url: ${url})`)
+        console.log(chalk`{red Unable to find element matching selector: '${selector}' (url: ${url})}`)
+        // throw new Error(`Unable to find element matching selector: '${selector}' (url: ${url})`)
+        return
     }
 
     const clip = await element.boundingBox()
@@ -41,10 +42,10 @@ const captureUrl = async (page, baseUrl, { path, selector, filename: _filename }
 Get page config
 
 */
-const getPageConfig = ({ pathSegments, blockId }) => ({
-    path: `/${pathSegments.join('/')}?capture`,
+const getPageConfig = ({ path, blockId }) => ({
+    path: `${path}?capture`,
     selector: `#${blockId}`,
-    filename: `${pathSegments.join('_')}_${blockId}`,
+    filename: blockId,
 })
 
 /*
@@ -60,14 +61,14 @@ const captureSitemap = async ({ browserPage, baseUrl, outputDir, sitemap, pathSe
 
         if (page.blocks) {
             for (let block of page.blocks) {
-                const pageConfig = getPageConfig({ pathSegments: [...pathSegments, page.id], blockId: block.id })
+                const pageConfig = getPageConfig({ path: page.path, blockId: block.id })
                 console.log(chalk`      {dim filename: {white ${pageConfig.filename}}}`)
                 await captureUrl(browserPage, baseUrl, pageConfig, outputDir)
             }
         }
 
         if (page.children) {
-           await captureSitemap({ baseUrl, outputDir, sitemap: page.children, level: level+1, pathSegments: [...pathSegments, page.id]})
+           await captureSitemap({ browserPage, baseUrl, outputDir, sitemap: page.children, level: level+1, pathSegments: [...pathSegments, page.id]})
         }
     }
 }
