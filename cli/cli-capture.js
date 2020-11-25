@@ -5,6 +5,7 @@ const chalk = require('chalk')
 const YAML = require('yamljs')
 const { isDirectory } = require('./lib/fs')
 const capture = require('./lib/capture')
+const { mkdirSync } = require('fs')
 
 program.arguments('<surveypath>').parse(process.argv)
 
@@ -27,14 +28,16 @@ const run = async () => {
     try {
         console.log(chalk`{yellow starting capture for {white ${survey}} survey}`)
 
-        const config = YAML.load(path.join(surveyDir, 'capture.yml'))
+        const config = YAML.load(path.join(surveyDir, 'config/capture.yml'))
         
         const sitemap = YAML.load(path.join(surveyDir, config.sitemap))
+
+        const outputDir = path.join(surveyDir, config.outputDir)
 
         await capture({
             ...config,
             sitemap,
-            outputDir: path.join(surveyDir, config.outputDir)
+            outputDir,
         })
     } catch (err) {
         console.error(chalk`{red ✘ an unexpected error occurred while capturing}`)
