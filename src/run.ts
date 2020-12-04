@@ -18,6 +18,13 @@ export const capture = async () => {
         process.exit(1)
     }
 
+    const outputDir = args[3]
+    if (!outputDir) {
+        logger.error(`no output directory provided`)
+        await flushLogs()
+        process.exit(1)
+    }
+
     const configDirPath = path.join(process.cwd(), resultsPath, CONFIG_DIR)
     console.log(configDirPath)
     if (!existsSync(configDirPath)) {
@@ -44,7 +51,7 @@ export const capture = async () => {
 
     await captureLocales({
         baseUrl: config.baseUrl,
-        outputDir: config.outputDir,
+        outputDir,
         sitemap,
     })
 }
