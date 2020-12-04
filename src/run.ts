@@ -25,15 +25,14 @@ export const capture = async () => {
         process.exit(1)
     }
 
-    const configDirPath = path.join(process.cwd(), resultsPath, CONFIG_DIR)
-    console.log(configDirPath)
-    if (!existsSync(configDirPath)) {
-        logger.error(`unable to locate config dir: ${configDirPath}`)
+    const configDir = path.join(process.cwd(), resultsPath, CONFIG_DIR)
+    if (!existsSync(configDir)) {
+        logger.error(`unable to locate config dir: ${configDir}`)
         await flushLogs()
         process.exit(1)
     }
 
-    const configFilePath = path.join(configDirPath, CAPTURE_CONFIG_FILE)
+    const configFilePath = path.join(configDir, CAPTURE_CONFIG_FILE)
     if (!existsSync(configFilePath)) {
         logger.error(`unable to locate config file: ${configFilePath}`)
         await flushLogs()
@@ -41,7 +40,7 @@ export const capture = async () => {
     }
     const config: CaptureConfig = YAML.load(configFilePath)
 
-    const sitemapPath = path.join(configDirPath, SITEMAP_FILE)
+    const sitemapPath = path.join(configDir, SITEMAP_FILE)
     if (!existsSync(sitemapPath)) {
         logger.error(`unable to locate sitemap: ${sitemapPath}`)
         await flushLogs()
