@@ -3,10 +3,10 @@ logs
 *.log
 
 # Captures
-# static/images/captures
+images
 
 # Builds
-public
+dist
 
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
@@ -23,8 +23,4 @@ node_modules
 # OSX
 .DS_Store
 
-# Secrets
-.env
-
-# docker volumes
-esdata
+config
