@@ -31,8 +31,6 @@ The file `config/capture.yml` should have the following structure:
 ```yaml
 # the base URL to use, can be either local or remote,
 baseUrl: http://localhost:9000
-# where to save the screenshots (relative to the survey app root)
-outputDir: static/images/captures
 ```
 
 Regarding the structure of the `sitemap.yml` file, please have
@@ -51,10 +49,14 @@ First you need to compile TypeScript:
 Then you can use the following command to run the captures:
 
 ```sh
-./capture ../StateOfCSS-2020
+./capture ../StateOfCSS-2020 ../screenshots/css_2020
 # or if you want to monitor how long it takes
-time ./capture ../StateOfCSS-2020 
+time ./capture ../StateOfCSS-2020 ../screenshots/css_2020 
 ```
+
+where `../StateOfCSS-2020` is the relative path to the survey results app,
+and `../screenshots/css_2020` the relative path to the directory used
+to save the screenshots.
 
 Some logs are gonna be generated in `capture.log`.
 

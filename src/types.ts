@@ -1,7 +1,6 @@
 // `capture.yml`
 export type CaptureConfig = Readonly<{
     baseUrl: string
-    outputDir: string
 }>
 
 export type SitemapBlock = Readonly<{
