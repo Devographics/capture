@@ -50,7 +50,11 @@ First you need to compile TypeScript:
 
 Then you can use the following command to run the captures:
 
-`./capture`
+```sh
+./capture ../StateOfCSS-2020
+# or if you want to monitor how long it takes
+time ./capture ../StateOfCSS-2020 
+```
 
 Some logs are gonna be generated in `capture.log`.
 
