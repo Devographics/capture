@@ -2,29 +2,13 @@ import path from 'path'
 import { existsSync } from 'fs'
 import YAML from 'yamljs'
 import { CaptureConfig, Sitemap } from './types'
-import { captureLocales } from './locales'
 import { logger, flushLogs } from './logger'
 
 const CONFIG_DIR = 'config'
 const CAPTURE_CONFIG_FILE = 'capture.yml'
 const SITEMAP_FILE = 'sitemap.yml'
 
-export const capture = async () => {
-    const args = process.argv
-    const resultsPath = args[2]
-    if (!resultsPath) {
-        logger.error(`no survey results path provided`)
-        await flushLogs()
-        process.exit(1)
-    }
-
-    const outputDir = args[3]
-    if (!outputDir) {
-        logger.error(`no output directory provided`)
-        await flushLogs()
-        process.exit(1)
-    }
-
+export const getConfig = async (resultsPath: string, outputDir: string) => {
     const configDir = path.join(process.cwd(), resultsPath, CONFIG_DIR)
     if (!existsSync(configDir)) {
         logger.error(`unable to locate config dir: ${configDir}`)
@@ -48,9 +32,10 @@ export const capture = async () => {
     }
     const sitemap: Sitemap = YAML.load(sitemapPath)
 
-    await captureLocales({
+    return {
         baseUrl: config.baseUrl,
         outputDir,
         sitemap,
-    })
+        mosaic: config.mosaic,
+    }
 }

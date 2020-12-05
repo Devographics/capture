@@ -6,6 +6,9 @@ which can then be used for social sharing for example.
 It's gonna generate screenshots for every locale and every 
 exportable block. 
 
+It also provides an extra utility to generate a mosaic of all
+screenshots for every available locale.
+
 [requirements](#requirements) | [install](#install) | [usage](#usage) | [contributing](#contributing)
 
 ## Requirements
@@ -31,6 +34,14 @@ The file `config/capture.yml` should have the following structure:
 ```yaml
 # the base URL to use, can be either local or remote,
 baseUrl: http://localhost:9000
+# configuration for mosaic generation
+mosaic:
+    thumb_width: 500
+    thumb_height: 400
+    columns: 14
+    # background color to use for the generated image
+    # which should be aligned with the survey styles
+    background: 0x232840FF
 ```
 
 Regarding the structure of the `sitemap.yml` file, please have
@@ -46,7 +57,9 @@ First you need to compile TypeScript:
 
 `yarn build`
 
-Then you can use the following command to run the captures:
+### Generate the screenshots
+
+You can use the following command to run the captures:
 
 ```sh
 ./capture ../StateOfCSS-2020 ../screenshots/css_2020
@@ -59,6 +72,16 @@ and `../screenshots/css_2020` the relative path to the directory used
 to save the screenshots.
 
 Some logs are gonna be generated in `capture.log`.
+
+### Generating a mosaic of all screenshots
+
+You can use the following command to generate the mosaics:
+
+```sh
+./mosaic ../StateOfCSS-2020 ../screenshots/css_2020
+```
+
+then each locale screenshot folder will contain a `mosaic.png` file.
 
 ## Contributing
 

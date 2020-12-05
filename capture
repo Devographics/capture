@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-const { capture } = require('./dist/run')
+const { capture } = require('./dist/capture')
 
 capture()
