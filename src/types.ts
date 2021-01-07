@@ -1,6 +1,14 @@
+export type MosaicConfig = Readonly<{
+    thumb_width: number
+    thumb_height: number
+    columns: number
+    background: number
+}>
+
 // `capture.yml`
 export type CaptureConfig = Readonly<{
     baseUrl: string
+    mosaic: MosaicConfig
 }>
 
 export type SitemapBlock = Readonly<{
