@@ -62,9 +62,11 @@ First you need to compile TypeScript:
 You can use the following command to run the captures:
 
 ```sh
-./capture ../StateOfCSS-2020 ../screenshots/css_2020
+./capture ../stateof-monorepo/results/surveys/css2022/config/config.yml ../stateof-images/captures/css2022
 # or if you want to monitor how long it takes
 time ./capture ../StateOfCSS-2020 ../screenshots/css_2020 
+# restart from a specific locale
+./capture ../stateof-monorepo/results/surveys/graphql2022/config/config.yml ../stateof-images/captures/graphql2022 de-DE+
 ```
 
 where `../StateOfCSS-2020` is the relative path to the survey results app,

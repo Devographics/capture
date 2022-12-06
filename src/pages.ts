@@ -3,13 +3,15 @@ import puppeteer from 'puppeteer'
 import { SitemapBlock, SitemapPage } from './types'
 import { logger } from './logger'
 
+const IS_HEADLESS = true
+
 // define the viewport dimensions, which have to be
 // pretty large in order to have everything visible
 const VIEWPORT_WIDTH = 1400
 const VIEWPORT_HEIGHT = 10000
 
 // add some extra space around the captures
-const CAPTURE_AREA_MARGIN = 20
+const CAPTURE_AREA_MARGIN = 0
 
 /**
  * Capture all blocks for a page,
@@ -28,7 +30,7 @@ const capturePage = async ({
     outputDir: string
     locale: string
 }) => {
-    const browser = await puppeteer.launch({ headless: true })
+    const browser = await puppeteer.launch({ headless: IS_HEADLESS, timeout: 0 })
     const browserPage = await browser.newPage()
     await browserPage.setViewport({
         width: VIEWPORT_WIDTH,
@@ -36,35 +38,40 @@ const capturePage = async ({
         deviceScaleFactor: 2,
     })
     await browserPage.emulateMediaType('screen')
-    await browserPage.goto(url)
+    await browserPage.goto(url, { waitUntil: 'load', timeout: 0 })
 
     for (const block of blocks) {
-        const blockSelector = `#${block.id}`
-        const element = await browserPage.$(blockSelector)
-        if (element === null) {
-            logger.error(
-                `[${locale}] Unable to find element matching selector: '${blockSelector}' (url: ${url})`
-            )
-            continue
-        }
+        for (const blockVariant of block.variants) {
+            if (!blockVariant.disableExport) {
+                const blockSelector = `#${blockVariant.id}`
+                const element = await browserPage.$(blockSelector)
+                if (element === null) {
+                    logger.error(
+                        `[${locale}] Unable to find element matching selector: '${blockSelector}' (url: ${url})`
+                    )
+                    continue
+                }
 
-        const filename = path.join(outputDir, locale, `${block.id}.png`)
-        const clip = await element.boundingBox()
-        if (clip !== null) {
-            await browserPage.screenshot({
-                path: filename,
-                clip: {
-                    x: clip.x - CAPTURE_AREA_MARGIN,
-                    y: clip.y - CAPTURE_AREA_MARGIN,
-                    width: clip.width + CAPTURE_AREA_MARGIN * 2,
-                    height: clip.height + CAPTURE_AREA_MARGIN * 2,
-                },
-            })
+                const filename = path.join(outputDir, locale, `${blockVariant.id}.png`)
+                const clip = await element.boundingBox()
+                if (clip !== null) {
+                    await browserPage.screenshot({
+                        path: filename,
+                        clip: {
+                            x: clip.x - CAPTURE_AREA_MARGIN,
+                            y: clip.y - CAPTURE_AREA_MARGIN,
+                            width: clip.width + CAPTURE_AREA_MARGIN * 2,
+                            height: clip.height + CAPTURE_AREA_MARGIN * 2,
+                        },
+                    })
 
-            logger.debug(`[${locale}] ${pathSegments.join('/')}${blockSelector} (${filename})`)
+                    logger.debug(
+                        `[${locale}] ${pathSegments.join('/')}${blockSelector} (${filename})`
+                    )
+                }
+            }
         }
     }
-
     await browser.close()
 }
 
@@ -87,16 +94,13 @@ export const capturePages = async ({
 }) => {
     for (const page of pages) {
         if (Array.isArray(page.blocks)) {
-            const exportableBlocks = page.blocks.filter((block) => block.enableExport)
-            if (exportableBlocks.length > 0) {
-                await capturePage({
-                    url: `${baseUrl}/${locale}${page.path}?capture`,
-                    pathSegments: [...pathSegments, page.id],
-                    blocks: exportableBlocks,
-                    outputDir,
-                    locale,
-                })
-            }
+            await capturePage({
+                url: `${baseUrl}/${locale}${page.path}?capture`,
+                pathSegments: [...pathSegments, page.id],
+                blocks: page.blocks,
+                outputDir,
+                locale,
+            })
         }
 
         if (Array.isArray(page.children)) {

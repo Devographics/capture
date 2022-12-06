@@ -3,8 +3,8 @@ import { getConfig } from './config'
 
 export const parseCliConfig = async () => {
     const args = process.argv
-    const resultsPath = args[2]
-    if (!resultsPath) {
+    const configPath = args[2]
+    if (!configPath) {
         logger.error(`no survey results path provided`)
         await flushLogs()
         process.exit(1)
@@ -17,5 +17,7 @@ export const parseCliConfig = async () => {
         process.exit(1)
     }
 
-    return getConfig(resultsPath, outputDir)
+    const startFromLocale = args[4]
+
+    return getConfig(configPath, outputDir, startFromLocale)
 }

@@ -8,12 +8,19 @@ export type MosaicConfig = Readonly<{
 // `capture.yml`
 export type CaptureConfig = Readonly<{
     baseUrl: string
+    sitemap: string
     mosaic: MosaicConfig
 }>
 
 export type SitemapBlock = Readonly<{
     id: Readonly<string>
-    enableExport?: Readonly<boolean>
+    disableExport?: Readonly<boolean>
+    variants: Readonly<BlockVariant[]>
+}>
+
+export type BlockVariant = Readonly<{
+    id: Readonly<string>
+    disableExport?: Readonly<boolean>
 }>
 
 export type SitemapPage = Readonly<{
