@@ -1,4 +1,4 @@
-# State of X | capturing tool
+# Devographics | chart screenshot capturing tool
 
 This project generate screenshots of the survey result apps
 which can then be used for social sharing for example.
@@ -29,23 +29,6 @@ file available in the project's directory.
 > prior to trying to capture.
 > You also need to **make sure the application is running** :)
 
-The file `config/capture.yml` should have the following structure:
-
-```yaml
-# the base URL to use, can be either local or remote,
-baseUrl: http://localhost:9000
-# configuration for mosaic generation
-mosaic:
-    thumb_width: 500
-    thumb_height: 400
-    columns: 14
-    # background color to use for the generated image
-    # which should be aligned with the survey styles
-    background: 0x232840FF
-```
-
-Regarding the structure of the `sitemap.yml` file, please have
-a look at the `Sitemap` type in `src/types.ts`. 
 
 ## Install
 
@@ -62,18 +45,47 @@ First you need to compile TypeScript:
 You can use the following command to run the captures:
 
 ```sh
-./capture ../stateof-monorepo/results/surveys/css2022/config/config.yml ../stateof-images/captures/css2022
+./capture ../monorepo/results/surveys/css2022/config/config.yml ../images/captures/css2022
 # or if you want to monitor how long it takes
 time ./capture ../StateOfCSS-2020 ../screenshots/css_2020 
 # restart from a specific locale
 ./capture ../stateof-monorepo/results/surveys/graphql2022/config/config.yml ../stateof-images/captures/graphql2022 de-DE+
 ```
 
-where `../StateOfCSS-2020` is the relative path to the survey results app,
-and `../screenshots/css_2020` the relative path to the directory used
+
+where `../monorepo/results/surveys/css2022/` is the relative path to the survey results app,
+and `../images/captures/css2022` the relative path to the directory used
 to save the screenshots.
 
 Some logs are gonna be generated in `capture.log`.
+
+### Use local config and sitemap
+
+If the path computed automatically or config from the result app are not correct, 
+you can put a config and sitemap directly in the "./config" folder:
+
+```sh
+./capture ./config/config.yml ../images/captures/css2022
+```
+The file `config/config.yml` should have the following structure:
+
+```yaml
+# the base URL to use, can be either local or remote,
+baseUrl: http://localhost:9000
+# optionnaly if you want to use a local sitemap
+sitemap: "./sitemap.yml"
+# configuration for mosaic generation
+mosaic:
+    thumb_width: 500
+    thumb_height: 400
+    columns: 14
+    # background color to use for the generated image
+    # which should be aligned with the survey styles
+    background: 0x232840FF
+```
+
+Regarding the structure of the `sitemap.yml` file, please have
+a look at the `Sitemap` type in `src/types.ts`. 
 
 ### Generating a mosaic of all screenshots
 

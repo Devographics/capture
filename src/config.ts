@@ -23,7 +23,7 @@ export const getConfig = async (configFilePath: string, outputDir: string, start
         process.exit(1)
     }
     const config: CaptureConfig = YAML.load(configFilePath)
-    const configDirPath = configFilePath.split('/').slice(0,-1).join('/')
+    const configDirPath = configFilePath.split('/').slice(0, -1).join('/')
     const sitemapPath = path.join(configDirPath, config.sitemap)
 
     // const sitemapPath = path.join(configDir, SITEMAP_FILE)

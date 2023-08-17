@@ -5,9 +5,17 @@ export type MosaicConfig = Readonly<{
     background: number
 }>
 
-// `capture.yml`
+/**
+ * Config file from the Gatsby app "results/surveys/css2022/config.yml"
+ * Or a config defined locally in "./config/config.yml"
+ */
 export type CaptureConfig = Readonly<{
     baseUrl: string
+    /**
+     * Absolute path to the sitemap
+     * OR
+     * path relative to the config file
+     */
     sitemap: string
     mosaic: MosaicConfig
 }>
