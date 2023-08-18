@@ -1,5 +1,5 @@
 # the base URL to use, can be either local or remote,
-baseUrl: https://2022.stateofcss.com/en-US
+baseUrl: https://2022.stateofcss.com
 #http://localhost:9000
 sitemap: './sitemap.yml'
 # configuration for mosaic generation
